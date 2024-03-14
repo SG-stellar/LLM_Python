@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import pandas as pd
 # import nest_asyncio
+import openai
 from openai import OpenAI
 import time
 
