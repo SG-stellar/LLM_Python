@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 import pandas as pd
-from pypdf import PdfReader
 # import nest_asyncio
 from openai import OpenAI
 import time
