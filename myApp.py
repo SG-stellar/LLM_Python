@@ -1,32 +1,26 @@
 import streamlit as st
 import os
 import pandas as pd
-from io import StringIO
 from pypdf import PdfReader
-import nest_asyncio
-from llama_index.core import (VectorStoreIndex, SimpleDirectoryReader, StorageContext,
-        load_index_from_storage)
-from llama_index.core.tools import (QueryEngineTool, ToolMetadata)
-from llama_index.core import Settings
-from llama_index.core import Document
-from llama_index.readers.file import PDFReader
-from llama_index.agent.openai import OpenAIAssistantAgent
+# import nest_asyncio
 from openai import OpenAI
+import time
 
-nest_asyncio.apply()
+# nest_asyncio.apply()
 
-os.environ["OPENAI_API_KEY"] = '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'
-client = OpenAI(api_key='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')
+client = OpenAI(api_key='')
 
 
-st.title("My Personal Lengthy Doc Reader")
+st.title("My Personal Doc Reader")
 st.write("Upload the doc below:")
 
 
-uploaded_file = st.file_uploader("Choose a file")
+uploaded_file = st.file_uploader("Choose a document pdf file")
 if uploaded_file is not None:
 
-    # See openAI_API_tests.ipynb
+    # See openAI_retrieval_assitant.py
+
+    client = OpenAI(api_key=os.environ.get('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'))
 
     # Upload a file with an "assistants" purpose
     file = client.files.create(
@@ -36,7 +30,7 @@ if uploaded_file is not None:
 
     # Add the file to the assistant
     assistant = client.beta.assistants.create(
-    instructions = "You are a helpful agent. Use your knowledge base to best answer queries.",
+    instructions = "You are a customer support chatbot. Use your knowledge base to best answer queries.",
     model="gpt-4-turbo-preview",
     tools=[{"type": "retrieval"}],
     file_ids=[file.id]
@@ -60,67 +54,36 @@ if uploaded_file is not None:
         # tools=[{"type": "code_interpreter"}, {"type": "retrieval"}]
     )
 
-    run_steps = client.beta.threads.runs.steps.list(
-        thread_id=thread.id,
-        run_id = run.id
-    )
+    # this places the thread in retrieval status
+    run = client.beta.threads.runs.retrieve(
+            thread_id=thread.id,
+            run_id=run.id)
+
+
+
+    #wait for query to complete
+    i=0
+    while (run.status != "completed") & (i<20):
+        run = client.beta.threads.runs.retrieve(
+            thread_id=thread.id,
+            run_id=run.id)
+    
+        time.sleep(3)
+        i=i+1
+        st.write(f"Current state ({i*3} sec): {run.status}")
 
     #retrieve message(s) from this thread
-    messages = client.beta.threads.messages.list(thread.id)
+    messages = client.beta.threads.messages.list(thread_id=thread.id)
 
-    assitant_response = messages.data[0].content[0].text.value
-    st.write ( assitant_response )
-
-
-
-    # reader = PdfReader ( uploaded_file )
-    # pgs = reader.pages
-    # textt = ''
-    # for pg in pgs:
-    #     textt = textt + pg.extract_text()
-    # st.write ( textt )
+    mess = messages.data[0]
+    st.write(mess.content[0].text.value)
 
 
-
-    # agent = OpenAIAssistantAgent.from_new(
-    # name="Fact Checker",
-    # instructions="You are fact checking the articles.",
-    # openai_tools=[{"type": "retrieval"}],
-    # files=[textt],
-    # verbose=True,
-    # )
-
-
-
-
-    # reader = PdfReader ( uploaded_file )
-    # pgs = reader.pages
-    # textt = ''
-    # for pg in pgs:
-    #     textt = textt + pg.extract_text()
-    # st.write ( text )
-
-    # paperr_doc = PDFReader.load_data(file = uploaded_file)
-
-    # try:
-    #     storage_context = StorageContext.from_defaults(
-    #         persist_dir="./storage"
-    #     )
-    #     paperr_index = load_index_from_storage(storage_context)
-
-    #     index_loaded = True
-    # except:
-    #     index_loaded = False
-
-    # if not index_loaded:
-        # load data
-    # paperr_doc = Document( text = textt )
-        # paperr_doc = SimpleDirectoryReader(
-        #     input_files=[uploaded_file]
-        # ).load_data()
-
-        # build index
-    # paperr_index = VectorStoreIndex.from_documents( paperr_doc )
-
-        # persist index
-        # paperr_index.storage_context.persist(persist_dir="./storage")
+#clean up: delete file, assistant
+try:
+    file_deletion_status = client.beta.assistants.files.delete(
+    assistant_id=assistant.id,
+    file_id=file.id
+    )
+except:
+    pass
