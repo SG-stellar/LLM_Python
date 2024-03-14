@@ -20,7 +20,7 @@ if uploaded_file is not None:
 
     # See openAI_retrieval_assitant.py
 
-    client = OpenAI(api_key=os.environ.get('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'))
+    client = OpenAI(api_key=os.environ.get(''))
 
     # Upload a file with an "assistants" purpose
     file = client.files.create(
