@@ -8,7 +8,7 @@ import time
 
 # nest_asyncio.apply()
 
-client = OpenAI(api_key='')
+client = OpenAI()
 
 
 st.title("My Personal Doc Reader")
