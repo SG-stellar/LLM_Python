@@ -17,10 +17,6 @@ st.write("Upload the doc below:")
 uploaded_file = st.file_uploader("Choose a document pdf file")
 if uploaded_file is not None:
 
-    # See openAI_retrieval_assitant.py
-
-    client = OpenAI(api_key=os.environ.get(''))
-
     # Upload a file with an "assistants" purpose
     file = client.files.create(
     file=uploaded_file,
