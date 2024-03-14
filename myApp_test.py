@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import pandas as pd
+from openai import OpenAI
 
 
 st.title("My Personal Doc Reader")
