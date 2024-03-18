@@ -9,13 +9,6 @@ from llama_index.core import Settings
 from pypdf import PdfReader
 from llama_index.llms.anthropic import Anthropic
 
-# Include "openai" 
-# "llama_index" 
-# "pypdf" 
-# llama-index-llms-anthropic
-# into the "requirements.txt" file
-
-
 
 
 def myquery ( ffile, promptt, modelll, chunkkk, placeholderr, oaswitch):
@@ -28,11 +21,8 @@ def myquery ( ffile, promptt, modelll, chunkkk, placeholderr, oaswitch):
         textt = textt + reader.pages[i].extract_text()
 
 
-
     documents = [Document(text=textt)]
  
-    # link to settings
-    # https://docs.llamaindex.ai/en/latest/module_guides/supporting_modules/service_context_migration.html
     if oaswitch == "OpenAI":
         Settings.llm = OpenAI(model=modelll)
         # Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
@@ -41,7 +31,6 @@ def myquery ( ffile, promptt, modelll, chunkkk, placeholderr, oaswitch):
         # Settings.context_window = 3900
     else:
         Settings.llm = Anthropic(model="claude-3-opus-20240229")
-
 
     # build index
     placeholderr.markdown("Indexing the file...")
