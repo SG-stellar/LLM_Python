@@ -25,11 +25,19 @@ def myquery ( ffile, promptt, modelll, chunkkk, placeholderr, oaswitch):
  
     if oaswitch == "OpenAI":
         Settings.llm = OpenAI(model=modelll)
-        # Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+        Settings.tokenizer = tiktoken.encoding_for_model(modelll).encode
+        Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large") 
+        # Open AI: text-embedding-3-large is our new next generation larger embedding model and creates embeddings with up to 3072 dimensions.
+        # Stronger performance. text-embedding-3-large is our new best performing model. 
+        # Comparing text-embedding-ada-002 to text-embedding-3-large: on MIRACL, the average score has increased from 31.4% to 54.9%, 
+        # while on MTEB, the average score has increased from 61.0% to 64.6%.
         Settings.node_parser = SentenceSplitter(chunk_size=chunkkk, chunk_overlap=20)
-        # Settings.num_output = 512
-        # Settings.context_window = 3900
+        Settings.text_splitter = SentenceSplitter(chunk_size=chunkkk)
+        Settings.num_output = 1024
+        Settings.context_window = 4096
     else:
+        tokenizer = Anthropic().tokenizer
+        Settings.tokenizer = tokenizer
         Settings.llm = Anthropic(model="claude-3-opus-20240229")
 
     # build index
@@ -83,4 +91,3 @@ placeholder = st.empty()
 if (uploaded_file is not None) :
     tt = myquery ( uploaded_file, str(option), modell, chunk, placeholder, oaswitch)
     placeholder.markdown(tt)
-    # st.balloons()
