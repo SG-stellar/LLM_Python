@@ -1,1 +1,4 @@
 openai
+llama_index
+pypdf
+llama-index-llms-anthropic
