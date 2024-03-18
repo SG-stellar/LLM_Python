@@ -1,11 +1,11 @@
 import streamlit as st
 import time
-# from openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Document, VectorStoreIndex
 from llama_index.core import Settings
+import tiktoken
 from pypdf import PdfReader
 from llama_index.llms.anthropic import Anthropic
 
